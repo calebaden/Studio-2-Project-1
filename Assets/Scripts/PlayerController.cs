@@ -5,17 +5,19 @@ using UnityEngine;
 public class PlayerController : MonoBehaviour
 {
     GameController gameController;
+    UIController uiController;
+    AudioSource source;
 
     public float moveSpeed;
-
     private float maxRayDist = 3;
-
-    AudioSource source;
+    public bool canMove = true;
+    private float interactAnxiety = 0.2f;
 
     // Use this for initialization
     void Start ()
     {
         gameController = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameController>();
+        uiController = GameObject.FindGameObjectWithTag("UIController").GetComponent<UIController>();
         source = GetComponent<AudioSource>();
     }
 	
@@ -26,23 +28,26 @@ public class PlayerController : MonoBehaviour
         RaycastHit hit;
         Ray interactRay = new Ray(transform.position, transform.forward);
 
-         if (Physics.Raycast(interactRay, out hit, maxRayDist))
+         if (Physics.Raycast(interactRay, out hit, maxRayDist))                             // Check if the raycast hit any colliders within the maximum range
         {
-            if (hit.collider.CompareTag("NPC"))
+            if (hit.collider.CompareTag("NPC"))                                             // Check if the racast hit is an NPC
             {
-                // If there is a character in range check if the player uses the interact button
-                if (Input.GetButtonDown("Interact"))
+                if (Input.GetButtonDown("Interact"))                                        // If there is a character in range check if the player uses the interact button
                 {
-                    gameController.anxiety -= 0.25f;
-                    Debug.Log("You did it!");       // If the player does interact, lower the players anxiety level
+                    gameController.anxiety3 -= interactAnxiety;                              // When the player interacts with an NPC negate anxiety
+                    //Play conversation sound
                 }
             }
         }
 
-        source.volume = gameController.anxiety;
+        source.volume = gameController.anxiety;                                             // Set the audio source volume to equal the anxiety variable
         
-        Movement();
-        CharacterRange();
+        if (canMove)
+        {
+            Movement();
+        }
+        
+        gameController.anxiety2 = CharacterRange();
 	}
 
     // Function that controls the players movement
@@ -76,21 +81,21 @@ public class PlayerController : MonoBehaviour
         return closest;
     }
 
-    void CharacterRange ()
+    float CharacterRange ()
     {
-        int range = 5;
-        bool inRange;
+        int range = 8;
+        float anxietyAmount;
 
         // Determine the distance between the player and the closest NPC, if it is lower than the maximum range, increase the players anxiety
         if (Vector3.Distance(transform.position, FindClosestCharacter().transform.position) <= range)
         {
-            inRange = true;
+            anxietyAmount = 0.4f - Vector3.Distance(transform.position, FindClosestCharacter().transform.position) / 20;
         }
         else
         {
-            inRange = false;
+            anxietyAmount = 0;
         }
 
-        gameController.IncreaseAnxiety(inRange);
+        return anxietyAmount;
     }
 }

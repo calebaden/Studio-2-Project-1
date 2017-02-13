@@ -20,7 +20,6 @@ public class LevelController : MonoBehaviour
     void Start ()
     {
         gameController = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameController>();
-        gameController.levelController = this;
 	}
 	
 	// Update is called once per frame
@@ -38,7 +37,7 @@ public class LevelController : MonoBehaviour
         {
             if (levelTimer > 0)
             {
-                levelTimer -= Time.deltaTime;
+                //levelTimer -= Time.deltaTime;
             }
             else
             {
