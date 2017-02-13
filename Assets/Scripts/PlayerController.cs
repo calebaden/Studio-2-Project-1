@@ -12,12 +12,12 @@ public class PlayerController : MonoBehaviour
 
     AudioSource source;
 
-	// Use this for initialization
-	void Start ()
+    // Use this for initialization
+    void Start ()
     {
         gameController = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameController>();
         source = GetComponent<AudioSource>();
-	}
+    }
 	
 	// Update is called once per frame
 	void Update ()
