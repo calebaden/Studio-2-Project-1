@@ -9,10 +9,11 @@ public class PlayerController : MonoBehaviour
     AudioController audioController;
     GameObject npc = null;
 
+    public float baseMoveSpeed;
     public float moveSpeed;
     private float maxRayDist = 3;
     public bool canMove = true;
-    private float interactAnxiety = 0.15f;
+    public float interactAnxiety = 0.1f;
 
     // Use this for initialization
     void Start ()
@@ -54,6 +55,7 @@ public class PlayerController : MonoBehaviour
         }
         
         gameController.anxiety2 = CharacterRange();
+        moveSpeed = (baseMoveSpeed * (-gameController.anxiety + 1) + 1);
 	}
 
     // Function that controls the players movement

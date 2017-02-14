@@ -6,19 +6,17 @@ using UnityEngine.SceneManagement;
 public class LevelController : MonoBehaviour
 {
     GameController gameController;
+    UIController uiController;
 
     public GameObject endPosition;
-
     public int levelNum;
-
     private bool isPaused;
-
-    public float levelTimer;
 
     // Use this for initialization
     void Start ()
     {
         gameController = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameController>();
+        uiController = GameObject.FindGameObjectWithTag("UIController").GetComponent<UIController>();
 	}
 	
 	// Update is called once per frame
@@ -31,31 +29,41 @@ public class LevelController : MonoBehaviour
             {
                 StartCoroutine(ChangeLevel(1));
             }
+            if (Input.GetButtonDown("Cancel"))
+            {
+                Application.Quit();
+            }
         }
         else
         {
-            if (gameController.anxiety >= -0.9f)
-            {
-                //levelTimer -= Time.deltaTime;
-            }
-            else
+            // When the player reaches minimum anxiety, finish the level
+            if (gameController.anxiety <= -0.5f)
             {
                 endPosition.SetActive(true);
             }
 
-            if (Input.GetButtonDown("Cancel"))
+            if (isPaused)
             {
-                if (!isPaused)
+                if (Input.GetButtonDown("Submit"))
                 {
-                    Time.timeScale = 0;
-                    Cursor.lockState = CursorLockMode.None;
-                    isPaused = true;
+                    uiController.PauseMenuImage(0);
+                    Time.timeScale = 1;
+                    isPaused = false;
                 }
-                else
+                if (Input.GetButtonDown("Cancel"))
                 {
                     Time.timeScale = 1;
-                    Cursor.lockState = CursorLockMode.Locked;
                     isPaused = false;
+                    SceneManager.LoadScene(0);
+                }
+            }
+            else
+            {
+                if (Input.GetButtonDown("Cancel"))
+                {
+                    uiController.PauseMenuImage(1);
+                    isPaused = true;
+                    Time.timeScale = 0;
                 }
             }
         }

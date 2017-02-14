@@ -12,7 +12,6 @@ public class GameController : MonoBehaviour
     // Use this for initialization
     void Start ()
     {
-        DontDestroyOnLoad(gameObject);
         Cursor.lockState = CursorLockMode.Locked;
     }
 	

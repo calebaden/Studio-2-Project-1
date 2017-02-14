@@ -40,11 +40,6 @@ public class CameraScript : MonoBehaviour
         smoothV.x = Mathf.Lerp(smoothV.x, md.x, 1f / smoothing);
         smoothV.y = Mathf.Lerp(smoothV.y, md.y, 1f / smoothing);
 
-        /*if (mouseLook.y >= maxLookDownAngle)
-        {
-            smoothV.y -= lookDownSpeed;
-        }*/
-
         mouseLook += smoothV * Time.deltaTime;
 
         transform.localRotation = Quaternion.AngleAxis(-mouseLook.y, Vector3.right);

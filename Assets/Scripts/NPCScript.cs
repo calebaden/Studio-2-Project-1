@@ -13,12 +13,6 @@ public class NPCScript : MonoBehaviour
     {
         rend = GetComponent<Renderer>();
 	}
-	
-	// Update is called once per frame
-	void Update ()
-    {
-		
-	}
 
     public void ChangeMaterial ()
     {
