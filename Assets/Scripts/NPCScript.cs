@@ -4,12 +4,14 @@ using UnityEngine;
 
 public class NPCScript : MonoBehaviour
 {
-    Material material;
+    public Material newMaterial;
+    Renderer rend;
+    public bool isFriend = false;
 
-	// Use this for initialization
-	void Start ()
+    // Use this for initialization
+    void Start ()
     {
-		
+        rend = GetComponent<Renderer>();
 	}
 	
 	// Update is called once per frame
@@ -17,4 +19,10 @@ public class NPCScript : MonoBehaviour
     {
 		
 	}
+
+    public void ChangeMaterial ()
+    {
+        rend.material = newMaterial;
+        isFriend = true;
+    }
 }

@@ -6,19 +6,20 @@ public class PlayerController : MonoBehaviour
 {
     GameController gameController;
     UIController uiController;
-    AudioSource source;
+    AudioController audioController;
+    GameObject npc = null;
 
     public float moveSpeed;
     private float maxRayDist = 3;
     public bool canMove = true;
-    private float interactAnxiety = 0.2f;
+    private float interactAnxiety = 0.15f;
 
     // Use this for initialization
     void Start ()
     {
         gameController = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameController>();
         uiController = GameObject.FindGameObjectWithTag("UIController").GetComponent<UIController>();
-        source = GetComponent<AudioSource>();
+        audioController = GameObject.FindGameObjectWithTag("AudioController").GetComponent<AudioController>();
     }
 	
 	// Update is called once per frame
@@ -28,20 +29,25 @@ public class PlayerController : MonoBehaviour
         RaycastHit hit;
         Ray interactRay = new Ray(transform.position, transform.forward);
 
-         if (Physics.Raycast(interactRay, out hit, maxRayDist))                             // Check if the raycast hit any colliders within the maximum range
+        if (Physics.Raycast(interactRay, out hit, maxRayDist) && hit.collider.CompareTag("NPC"))                             // Check if the raycast hit an NPC within the maximum range
         {
-            if (hit.collider.CompareTag("NPC"))                                             // Check if the racast hit is an NPC
+            NPCScript npcScript = hit.collider.GetComponent<NPCScript>();
+            npc = hit.collider.gameObject;
+            uiController.isImageActive = true;
+
+            if (Input.GetButtonDown("Interact") && !npcScript.isFriend)                                         // If there is a character in range check if the player uses the interact button
             {
-                if (Input.GetButtonDown("Interact"))                                        // If there is a character in range check if the player uses the interact button
-                {
-                    gameController.anxiety3 -= interactAnxiety;                              // When the player interacts with an NPC negate anxiety
-                    //Play conversation sound
-                }
+                gameController.anxiety3 -= interactAnxiety;                              // When the player interacts with an NPC negate anxiety
+                audioController.PlayChatterSound();
+                npcScript.ChangeMaterial();
             }
         }
+        else if (npc !=null)
+        {
+            uiController.isImageActive = false;
+            npc = null;
+        }
 
-        source.volume = gameController.anxiety;                                             // Set the audio source volume to equal the anxiety variable
-        
         if (canMove)
         {
             Movement();
@@ -61,7 +67,7 @@ public class PlayerController : MonoBehaviour
         transform.Translate(horizontal, 0, vertical);
     }
 
-    // Function that finds and returns the closest NPC from the player character
+    // Function that finds and returns the closest non-friended NPC to the player character
     GameObject FindClosestCharacter ()
     {
         GameObject[] nonPlayables = GameObject.FindGameObjectsWithTag("NPC");       // Gathers all the NPC's from the current level into an array
@@ -71,31 +77,37 @@ public class PlayerController : MonoBehaviour
         // For each NPC in the array, compare their distance from the player to find the shortest distance
         foreach (GameObject character in nonPlayables)
         {
-            float diff = Vector3.Distance(transform.position, character.transform.position);
-            if (distance > diff)
+            if (!character.GetComponent<NPCScript>().isFriend)
             {
-                distance = diff;
-                closest = character;
+                float diff = Vector3.Distance(transform.position, character.transform.position);
+                if (distance > diff)
+                {
+                    distance = diff;
+                    closest = character;
+                }
             }
         }
         return closest;
     }
 
+    // Function that returns a float determined by the distance between the player and the closest non-friended npc
     float CharacterRange ()
     {
         int range = 8;
-        float anxietyAmount;
+        float anxietyAmount = 0;
 
-        // Determine the distance between the player and the closest NPC, if it is lower than the maximum range, increase the players anxiety
-        if (Vector3.Distance(transform.position, FindClosestCharacter().transform.position) <= range)
+        if (FindClosestCharacter() != null)
         {
-            anxietyAmount = 0.4f - Vector3.Distance(transform.position, FindClosestCharacter().transform.position) / 20;
+            // Determine the distance between the player and the closest NPC, if it is lower than the maximum range, increase the players anxiety
+            if (Vector3.Distance(transform.position, FindClosestCharacter().transform.position) <= range)
+            {
+                anxietyAmount = 0.8f - Vector3.Distance(transform.position, FindClosestCharacter().transform.position) / 20;
+            }
+            else
+            {
+                anxietyAmount = 0;
+            }
         }
-        else
-        {
-            anxietyAmount = 0;
-        }
-
         return anxietyAmount;
     }
 }

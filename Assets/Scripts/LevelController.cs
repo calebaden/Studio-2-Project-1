@@ -7,7 +7,6 @@ public class LevelController : MonoBehaviour
 {
     GameController gameController;
 
-    public GameObject player;
     public GameObject endPosition;
 
     public int levelNum;
@@ -35,7 +34,7 @@ public class LevelController : MonoBehaviour
         }
         else
         {
-            if (levelTimer > 0)
+            if (gameController.anxiety >= -0.9f)
             {
                 //levelTimer -= Time.deltaTime;
             }

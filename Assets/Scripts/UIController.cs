@@ -6,32 +6,14 @@ using UnityEngine.UI;
 public class UIController : MonoBehaviour
 {
     public Image interact;
+    public bool isImageActive = false;
+    public Texture interactTexture;
 
-    bool isImageActive = false;
-
-	// Use this for initialization
-	void Start ()
+    private void OnGUI()
     {
-
-	}
-	
-	// Update is called once per frame
-	void Update ()
-    {
-		
-	}
-
-    public void DisplayInteractImg (bool isHit)
-    {
-        if (isHit && !isImageActive)
+        if (isImageActive)
         {
-            Debug.Log("Image On");
-            interact.enabled = true;
-        }
-        else if (!isHit && isImageActive)
-        {
-            Debug.Log("Image Off");
-            interact.enabled = false;
+            GUI.DrawTexture(new Rect(300, 200, 50, 50), interactTexture);
         }
     }
 }

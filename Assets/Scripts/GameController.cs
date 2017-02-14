@@ -7,6 +7,7 @@ public class GameController : MonoBehaviour
     public float anxiety;
     public float anxiety2;
     public float anxiety3;
+    float lerpSpeed = 1f;
 
     // Use this for initialization
     void Start ()
@@ -18,6 +19,6 @@ public class GameController : MonoBehaviour
 	// Update is called once per frame
 	void Update ()
     {
-        anxiety = anxiety2 + anxiety3;
+        anxiety = Mathf.Lerp(anxiety, anxiety2 + anxiety3, lerpSpeed * Time.deltaTime);
     }
 }
