@@ -5,7 +5,7 @@ using UnityStandardAssets.ImageEffects;
 
 public class CameraScript : MonoBehaviour
 {
-    GameController gameController;
+    LevelController levelController;
 
     Vector2 mouseLook;
     Vector2 smoothV;
@@ -16,23 +16,40 @@ public class CameraScript : MonoBehaviour
     public float lookDownSpeedCoEf = 0.5f;
     public float lookDownSpeed;
     public float maxLookDownAngle = -45f;
+    public float slerpSpeed;
 
     GameObject player;
-
-    public float grayScaleAmount;
 
     // Use this for initialization
     void Start()
     {
-        gameController = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameController>();
+        levelController = GameObject.FindGameObjectWithTag("LevelController").GetComponent<LevelController>();
         player = transform.parent.gameObject;
     }
 
     // Update is called once per frame
     void Update()
     {
-        float sensitivity = (defaultSensitivity - gameController.anxiety) * sensitivityMult;
-        lookDownSpeed = gameController.anxiety * lookDownSpeedCoEf;
+        if (player.GetComponent<PlayerController>().canMove)
+        {
+            MouseMovement();
+        }
+        else
+        {
+            CameraLock();
+        }
+
+        GetComponent<Grayscale>().effectAmount = levelController.anxiety;
+        GetComponent<MotionBlur>().blurAmount = levelController.anxiety;
+        GetComponent<MotionBlur>().blurAmount = Mathf.Clamp01(GetComponent<MotionBlur>().blurAmount);
+        GetComponent<Vortex>().angle = levelController.anxiety * 100;
+        GetComponent<Vortex>().angle = Mathf.Clamp(GetComponent<Vortex>().angle, 0, 100);
+    }
+
+    void MouseMovement ()
+    {
+        float sensitivity = (defaultSensitivity - levelController.anxiety) * sensitivityMult;
+        lookDownSpeed = levelController.anxiety * lookDownSpeedCoEf;
 
         Vector2 md = new Vector2(Input.GetAxisRaw("Mouse X"), Input.GetAxisRaw("Mouse Y"));
 
@@ -44,7 +61,13 @@ public class CameraScript : MonoBehaviour
 
         transform.localRotation = Quaternion.AngleAxis(-mouseLook.y, Vector3.right);
         player.transform.localRotation = Quaternion.AngleAxis(mouseLook.x, player.transform.up);
+    }
 
-        GetComponent<Grayscale>().effectAmount = gameController.anxiety;
+    void CameraLock ()
+    {
+        //transform.LookAt(player.GetComponent<PlayerController>().lookTarget.transform);
+        Quaternion targetRotation = Quaternion.LookRotation(player.GetComponent<PlayerController>().lookTarget.transform.position - transform.position);
+
+        transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, slerpSpeed * Time.deltaTime);
     }
 }

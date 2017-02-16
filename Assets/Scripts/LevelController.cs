@@ -5,23 +5,36 @@ using UnityEngine.SceneManagement;
 
 public class LevelController : MonoBehaviour
 {
-    GameController gameController;
     UIController uiController;
+    PlayerController playerController;
+    public List<GameObject> friends;
 
     public GameObject endPosition;
     public int levelNum;
     private bool isPaused;
 
+    public float anxiety;
+    public float anxiety2;
+    public float anxiety3;
+    float lerpSpeed = 2f;
+
     // Use this for initialization
     void Start ()
     {
-        gameController = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameController>();
         uiController = GameObject.FindGameObjectWithTag("UIController").GetComponent<UIController>();
-	}
+        Cursor.lockState = CursorLockMode.Locked;
+
+        if (levelNum != 0)
+        {
+            playerController = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerController>();
+        }
+    }
 	
 	// Update is called once per frame
 	void Update ()
     {
+        anxiety = Mathf.Lerp(anxiety, anxiety2 + anxiety3, lerpSpeed * Time.deltaTime);
+
         // If the current level is not the main menu...
         if (levelNum == 0)
         {
@@ -37,9 +50,11 @@ public class LevelController : MonoBehaviour
         else
         {
             // When the player reaches minimum anxiety, finish the level
-            if (gameController.anxiety <= -0.5f)
+            if (anxiety <= -0.5f && playerController.canMove)
             {
+                playerController.gameObject.GetComponent<Rigidbody>().constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationZ | RigidbodyConstraints.FreezePositionY;
                 endPosition.SetActive(true);
+                playerController.canMove = false;
             }
 
             if (isPaused)
@@ -75,10 +90,10 @@ public class LevelController : MonoBehaviour
     }
 
     // Coroutine that calls the fade function from the fade script and then loads the next scene
-    IEnumerator ChangeLevel(int amount)
+    IEnumerator ChangeLevel(int buildIndex)
     {
-        float fadeTime = gameController.gameObject.GetComponent<SceneFadeScript>().BeginFade(1);
+        float fadeTime = GetComponent<SceneFadeScript>().BeginFade(1);
         yield return new WaitForSeconds(fadeTime);
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + amount);
+        SceneManager.LoadScene(buildIndex);
     }
 }

@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class AudioController : MonoBehaviour
 {
-    GameController gameController;
+    LevelController levelController;
     GameObject player;
     AudioSource globalSource;
     AudioSource playerSource;
@@ -13,7 +13,7 @@ public class AudioController : MonoBehaviour
 	// Use this for initialization
 	void Start ()
     {
-        gameController = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameController>();
+        levelController = GameObject.FindGameObjectWithTag("LevelController").GetComponent<LevelController>();
         player = GameObject.FindGameObjectWithTag("Player");
         globalSource = GetComponent<AudioSource>();
         playerSource = player.GetComponent<AudioSource>();
@@ -22,7 +22,7 @@ public class AudioController : MonoBehaviour
 	// Update is called once per frame
 	void Update ()
     {
-        playerSource.volume = gameController.anxiety;
+        playerSource.volume = levelController.anxiety;
     }
 
     public void PlayChatterSound ()

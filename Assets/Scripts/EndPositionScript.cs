@@ -5,16 +5,23 @@ using UnityEngine;
 public class EndPositionScript : MonoBehaviour
 {
     LevelController levelController;
+    PlayerController playerController;
 
     public GameObject player;
     public float finishTimer;
     public float moveSpeed;
 
-	// Use this for initialization
-	void Start ()
+    public GameObject schoolOneFocus;
+    public GameObject schoolTwoFocus;
+    public GameObject schoolThreeFocus;
+    public GameObject schoolFourFocus;
+
+    // Use this for initialization
+    void Start ()
     {
         levelController = GameObject.FindGameObjectWithTag("LevelController").GetComponent<LevelController>();
-        player.GetComponent<PlayerController>().canMove = false;
+        playerController = player.GetComponent<PlayerController>();
+        playerController.canMove = false;
     }
 	
 	// Update is called once per frame
@@ -27,25 +34,47 @@ public class EndPositionScript : MonoBehaviour
         }
         else
         {
+            foreach(GameObject friend in levelController.friends)
+            {
+                NPCScript npcScript = friend.GetComponent<NPCScript>();
+                npcScript.Unfriend();
+            }
+
             player.transform.parent = transform;
             transform.Translate(Vector3.right * moveSpeed * Time.deltaTime);
         }
-
-        
 	}
 
     void OnTriggerEnter (Collider otherObject)
     {
-        if (otherObject.CompareTag("LevelTrigger"))
+        if (otherObject.CompareTag("SchoolOneFinish"))
         {
-            if (levelController.levelNum != 4)
-            {
-                levelController.CallCoroutine(1);
-            }
-            else
-            {
-                levelController.CallCoroutine(-4);
-            }
+            playerController.lookTarget = schoolTwoFocus;       // Change the mouse view focus to be school two
+        }
+        else if (otherObject.CompareTag("SchoolTwoFinish"))
+        {
+            playerController.lookTarget = schoolThreeFocus;     // Change the mouse view focus to be school two
+        }
+        else if (otherObject.CompareTag("SchoolThreeFinish"))
+        {
+            playerController.lookTarget = schoolFourFocus;      // Change the mouse view focus to be school two
+        }
+        else if (otherObject.CompareTag("SchoolFourFinish"))
+        {
+            levelController.CallCoroutine(0);                   // After finishing the fourth level, load the menu
+        }
+
+        if (otherObject.CompareTag("SchoolTwoStart") || otherObject.CompareTag("SchoolThreeStart") || otherObject.CompareTag("SchoolFourStart"))
+        {
+            levelController.friends.Clear();
+            playerController.gameObject.GetComponent<Rigidbody>().constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationZ;
+            finishTimer = 3;
+            levelController.anxiety3 = 0.2f;
+            levelController.anxiety = 0;
+            player.transform.parent = null;
+            playerController.canMove = true;
+            otherObject.gameObject.SetActive(false);
+            gameObject.SetActive(false);
         }
     }
 }

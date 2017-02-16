@@ -4,23 +4,25 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
-    GameController gameController;
+    LevelController levelController;
     UIController uiController;
     AudioController audioController;
     GameObject npc = null;
+    public GameObject lookTarget;
+    Transform mCam;
 
     public float baseMoveSpeed;
     public float moveSpeed;
-    private float maxRayDist = 3;
+    private float maxRayDist = 2;
     public bool canMove = true;
-    public float interactAnxiety = 0.1f;
 
     // Use this for initialization
     void Start ()
     {
-        gameController = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameController>();
+        levelController = GameObject.FindGameObjectWithTag("LevelController").GetComponent<LevelController>();
         uiController = GameObject.FindGameObjectWithTag("UIController").GetComponent<UIController>();
         audioController = GameObject.FindGameObjectWithTag("AudioController").GetComponent<AudioController>();
+        mCam = transform.GetChild(0);
     }
 	
 	// Update is called once per frame
@@ -28,7 +30,7 @@ public class PlayerController : MonoBehaviour
     {
         // Create a new raycast infront of the player to determine whether there is a character to interact with
         RaycastHit hit;
-        Ray interactRay = new Ray(transform.position, transform.forward);
+        Ray interactRay = new Ray(mCam.position, mCam.forward);
 
         if (Physics.Raycast(interactRay, out hit, maxRayDist) && hit.collider.CompareTag("NPC"))                             // Check if the raycast hit an NPC within the maximum range
         {
@@ -36,16 +38,34 @@ public class PlayerController : MonoBehaviour
             npc = hit.collider.gameObject;
             uiController.isImageActive = true;
 
-            if (Input.GetButtonDown("Interact") && !npcScript.isFriend)                                         // If there is a character in range check if the player uses the interact button
+            if (Input.GetButtonDown("Interact") && !npcScript.isFriend)
             {
-                gameController.anxiety3 -= interactAnxiety;                              // When the player interacts with an NPC negate anxiety
                 audioController.PlayChatterSound();
-                npcScript.ChangeMaterial();
+            }
+
+            if (Input.GetButton("Interact") && !npcScript.isFriend)                                         // If there is a character in range check if the player uses the interact button
+            {
+                npcScript.Befriend();
+                uiController.progressBar.fillAmount = npcScript.interactProgress;
+            }
+
+            if (Input.GetButtonUp("Interact"))
+            {
+                if (!npcScript.isFriend)
+                {
+                    npcScript.interactProgress = 0;
+                }
+                uiController.progressBar.fillAmount = 0;
             }
         }
-        else if (npc !=null)
+        else if (npc != null)
         {
+            if (!npc.GetComponent<NPCScript>().isFriend)
+            {
+                npc.GetComponent<NPCScript>().interactProgress = 0;
+            }
             uiController.isImageActive = false;
+            uiController.progressBar.fillAmount = 0;
             npc = null;
         }
 
@@ -54,8 +74,8 @@ public class PlayerController : MonoBehaviour
             Movement();
         }
         
-        gameController.anxiety2 = CharacterRange();
-        moveSpeed = (baseMoveSpeed * (-gameController.anxiety + 1) + 1);
+        levelController.anxiety2 = CharacterRange();
+        moveSpeed = (baseMoveSpeed * (-levelController.anxiety + 1) + 1);
 	}
 
     // Function that controls the players movement

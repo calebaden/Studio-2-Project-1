@@ -6,11 +6,12 @@ using UnityEngine.UI;
 public class UIController : MonoBehaviour
 {
     public Image pauseMenu;
+    public Image progressBar;
     public bool isImageActive = false;
     public Texture interactTexture;
 
-    float w = 100;
-    float h = 100;
+    float w = 5;
+    float h = 5;
 
     private void OnGUI()
     {
