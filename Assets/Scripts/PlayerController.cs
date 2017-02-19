@@ -31,6 +31,7 @@ public class PlayerController : MonoBehaviour
         // Create a new raycast infront of the player to determine whether there is a character to interact with
         RaycastHit hit;
         Ray interactRay = new Ray(mCam.position, mCam.forward);
+        Debug.DrawRay(mCam.position, mCam.forward);
 
         if (Physics.Raycast(interactRay, out hit, maxRayDist) && hit.collider.CompareTag("NPC"))                             // Check if the raycast hit an NPC within the maximum range
         {
@@ -55,6 +56,11 @@ public class PlayerController : MonoBehaviour
                 {
                     npcScript.interactProgress = 0;
                 }
+                uiController.progressBar.fillAmount = 0;
+            }
+
+            if (npcScript.isFriend)
+            {
                 uiController.progressBar.fillAmount = 0;
             }
         }

@@ -52,7 +52,7 @@ public class LevelController : MonoBehaviour
             // When the player reaches minimum anxiety, finish the level
             if (anxiety <= -0.5f && playerController.canMove)
             {
-                playerController.gameObject.GetComponent<Rigidbody>().constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationZ | RigidbodyConstraints.FreezePositionY;
+                //playerController.gameObject.GetComponent<Rigidbody>().constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationZ | RigidbodyConstraints.FreezePositionY;
                 endPosition.SetActive(true);
                 playerController.canMove = false;
             }
