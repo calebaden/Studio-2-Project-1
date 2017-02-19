@@ -86,7 +86,7 @@ public class EndPositionScript : MonoBehaviour
             levelController.anxiety = 0;
             player.transform.parent = null;
             playerController.canMove = true;
-            player.transform.GetChild(0).GetComponent<CameraScript>().mouseLook = new Vector2(0, 0);
+            player.GetComponentInChildren<CameraScript>().mouseLook = Vector2.zero;
             otherObject.gameObject.SetActive(false);
             gameObject.SetActive(false);
         }

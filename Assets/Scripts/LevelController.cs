@@ -22,7 +22,6 @@ public class LevelController : MonoBehaviour
     void Start ()
     {
         uiController = GameObject.FindGameObjectWithTag("UIController").GetComponent<UIController>();
-        Cursor.lockState = CursorLockMode.Locked;
 
         if (levelNum != 0)
         {
@@ -38,13 +37,16 @@ public class LevelController : MonoBehaviour
         // If the current level is not the main menu...
         if (levelNum == 0)
         {
-            if (Input.GetButtonDown("Submit"))
+            if (!uiController.isCreditsActive)
             {
-                StartCoroutine(ChangeLevel(1));
-            }
-            if (Input.GetButtonDown("Cancel"))
-            {
-                Application.Quit();
+                if (Input.GetButtonDown("Submit"))
+                {
+                    StartCoroutine(ChangeLevel(1));
+                }
+                if (Input.GetButtonDown("Cancel"))
+                {
+                    Application.Quit();
+                }
             }
         }
         else

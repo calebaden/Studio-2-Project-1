@@ -10,8 +10,10 @@ public class UIController : MonoBehaviour
     public Image progressBar;
     public bool isImageActive = false;
     public Texture interactTexture;
-    bool isCreditsActive = false;
+    public bool isCreditsActive = false;
     public Text creditsText;
+    public Text controlsText;
+    public Text creditControlsText;
     public Image creditsImage;
 
     float w = 5;
@@ -25,6 +27,7 @@ public class UIController : MonoBehaviour
         {
             creditsText.enabled = false;
             creditsImage.enabled = false;
+            creditControlsText.enabled = false;
         }
     }
 
@@ -38,12 +41,16 @@ public class UIController : MonoBehaviour
                 {
                     creditsText.enabled = true;
                     creditsImage.enabled = true;
+                    controlsText.enabled = false;
+                    creditControlsText.enabled = true;
                     isCreditsActive = true;
                 }
                 else
                 {
                     creditsText.enabled = false;
                     creditsImage.enabled = false;
+                    controlsText.enabled = true;
+                    creditControlsText.enabled = false;
                     isCreditsActive = false;
                 }
             }

@@ -7,13 +7,15 @@ public class CameraScript : MonoBehaviour
 {
     LevelController levelController;
 
+    public float slerpSpeed;
+
+    Vector2 _mouseAbsolute;
+    Vector2 _smoothMouse;
+
     public Vector2 mouseLook;
     Vector2 smoothV;
-    public float defaultSensitivity;
-    public float sensitivityMult;
+    public float sensitivity;
     public float smoothing;
-    public float slerpSpeed;
-    public float maxAngleY;
 
     GameObject player;
     
@@ -25,8 +27,7 @@ public class CameraScript : MonoBehaviour
         mouseLook = new Vector2(0, 0);
     }
 
-    // Update is called once per frame
-    void Update()
+    private void LateUpdate()
     {
         if (player.GetComponent<PlayerController>().canMove)
         {
@@ -36,7 +37,11 @@ public class CameraScript : MonoBehaviour
         {
             CameraLock();
         }
+    }
 
+    // Update is called once per frame
+    void Update()
+    {
         GetComponent<Grayscale>().effectAmount = levelController.anxiety;
         GetComponent<MotionBlur>().blurAmount = levelController.anxiety;
         GetComponent<MotionBlur>().blurAmount = Mathf.Clamp01(GetComponent<MotionBlur>().blurAmount);
@@ -44,19 +49,17 @@ public class CameraScript : MonoBehaviour
         GetComponent<Vortex>().angle = Mathf.Clamp(GetComponent<Vortex>().angle, 0, 100);
     }
 
-    // Funcion that handles mouse movement view
     void MouseMovement ()
     {
-        float sensitivity = (defaultSensitivity - levelController.anxiety) * sensitivityMult;
+        // Ensure the cursor is always locked when set
+        Cursor.lockState = CursorLockMode.Locked;
 
-        Vector2 md = new Vector2(Input.GetAxisRaw("Mouse X"), Input.GetAxisRaw("Mouse Y"));
+        var md = new Vector2(Input.GetAxisRaw("Mouse X"), Input.GetAxisRaw("Mouse Y"));
 
         md = Vector2.Scale(md, new Vector2(sensitivity * smoothing, sensitivity * smoothing));
         smoothV.x = Mathf.Lerp(smoothV.x, md.x, 1f / smoothing);
         smoothV.y = Mathf.Lerp(smoothV.y, md.y, 1f / smoothing);
-
         mouseLook += smoothV * Time.deltaTime;
-        mouseLook.y = Mathf.Clamp(mouseLook.y, -maxAngleY, maxAngleY);
 
         transform.localRotation = Quaternion.AngleAxis(-mouseLook.y, Vector3.right);
         player.transform.localRotation = Quaternion.AngleAxis(mouseLook.x, player.transform.up);
